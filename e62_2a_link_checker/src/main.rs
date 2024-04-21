@@ -51,18 +51,18 @@ fn visit_page(client: &Client, command: &CrawlCommand) -> Result<Vec<Url>, Error
     Ok(link_urls)
 }
 
-struct CheckerLogic {
+struct History {
     url_visited: HashSet<String>,
     domain: String,
 }
 
-impl CheckerLogic {
-    fn new(start_url: &Url) -> CheckerLogic {
+impl History {
+    fn new(start_url: &Url) -> History {
         let mut url_visited = HashSet::new();
         let url = start_url.as_str().to_owned();
         let domain = start_url.domain().unwrap_or_default().to_owned();
         url_visited.insert(url);
-        CheckerLogic {
+        History {
             url_visited: url_visited,
             domain: domain,
         }
@@ -78,13 +78,17 @@ impl CheckerLogic {
             false
         }
     }
+
+    fn len(&self) -> usize {
+        self.url_visited.len()
+    }
 }
 
 fn main() {
     // const MAX_THREADS: u8 = 3;
     let start_url = Url::parse("https://www.google.org").unwrap();
     let client = Client::new();
-    let mut url_visited = CheckerLogic::new(&start_url);
+    let mut url_visited = History::new(&start_url);
     let mut url_to_visit = Vec::new();
     url_to_visit.push(start_url);
 
@@ -111,4 +115,5 @@ fn main() {
         }
     }
     println!("All links are OK.");
+    println!("Visited {} url", url_visited.len());
 }
